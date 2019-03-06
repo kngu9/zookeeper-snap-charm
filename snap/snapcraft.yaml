@@ -8,26 +8,36 @@ confinement: strict
 
 apps:
   zookeeper:
-    command: start-zookeeper-wrapper.bash
-    # daemon: simple
+    command: zookeeper-wrapper.sh start
+    stop-command: zookeeper-wrapper.sh stop
+    daemon: simple
     plugs: [network, network-bind, removable-media]
+
 parts:
-  build-zookeeper:
-    stage-packages:
-      - default-jre-headless
-    build-packages: 
-      - default-jre-headless
-      - libcppunit-dev
-      - python-setuptools
-      - autoconf
+  zookeeper:
     plugin: ant
     source: https://github.com/apache/zookeeper.git
     source-depth: 1
     source-tag: release-3.4.13
-    ant-build-targets: [clean, jar, deb]
+    override-build: |-
+      snapcraftctl build
+
+      cp ./build/zookeeper-3.4.13.jar .
+      cp ./conf/zoo_sample.cfg ./conf/zoo.cfg
+      (cd ../; tar -czf zookeeper.tgz ./build)
   wrapper:
-    after:
-      - build-zookeeper
     plugin: dump
     source: snap/local
-  
+  install:
+    plugin: nil
+    after:
+      - zookeeper
+    override-build: |-
+      tarball=/root/parts/zookeeper/zookeeper.tgz
+
+      mkdir -p $SNAPCRAFT_PART_INSTALL/opt/zookeeper
+      (cd $SNAPCRAFT_PART_INSTALL/opt; tar --strip-components=2 -C zookeeper -xzvf $tarball)
+    stage:
+      - opt
+    prime:
+      - opt
