@@ -1,0 +1,33 @@
+name: zookeeper
+base: core18
+version: '3.4.13'
+summary: Apache ZooKeeper enables highly reliable distributed coordination.
+description: ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.
+grade: stable
+confinement: strict
+
+apps:
+  zookeeper:
+    command: start-zookeeper-wrapper.bash
+    # daemon: simple
+    plugs: [network, network-bind, removable-media]
+parts:
+  build-zookeeper:
+    stage-packages:
+      - default-jre-headless
+    build-packages: 
+      - default-jre-headless
+      - libcppunit-dev
+      - python-setuptools
+      - autoconf
+    plugin: ant
+    source: https://github.com/apache/zookeeper.git
+    source-depth: 1
+    source-tag: release-3.4.13
+    ant-build-targets: [clean, jar, deb]
+  wrapper:
+    after:
+      - build-zookeeper
+    plugin: dump
+    source: snap/local
+  
