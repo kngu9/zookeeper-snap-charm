@@ -8,10 +8,13 @@ confinement: strict
 
 apps:
   zookeeper:
-    command: zookeeper-wrapper.sh start
+    command: zookeeper-wrapper.sh start-foreground
     stop-command: zookeeper-wrapper.sh stop
     daemon: simple
     plugs: [network, network-bind, removable-media]
+  client:
+    command: zkCli-wrapper.sh 
+    plugs: [network]
 
 parts:
   zookeeper:
@@ -32,6 +35,8 @@ parts:
     plugin: nil
     after:
       - zookeeper
+    build-packages:
+      - openjdk-8-jre
     override-build: |-
       tarball=/root/parts/zookeeper/zookeeper.tgz
 
