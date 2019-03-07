@@ -1,4 +1,4 @@
-name: zookeeper
+name: zk
 base: core18
 version: '3.4.13'
 summary: Apache ZooKeeper enables highly reliable distributed coordination.
@@ -7,7 +7,7 @@ grade: stable
 confinement: strict
 
 apps:
-  zookeeper:
+  zk:
     command: zookeeper-wrapper.sh start-foreground
     stop-command: zookeeper-wrapper.sh stop
     daemon: simple

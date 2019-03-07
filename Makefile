@@ -5,9 +5,9 @@ ZOOKEEPER_VERSION := $(shell awk '/version:/ {print $$2}' snap/snapcraft.yaml | 
 all: sysdeps snap
 
 .PHONY: snap
-snap: zookeeper_$(ZOOKEEPER_VERSION)_amd64.snap
+snap: zk_$(ZOOKEEPER_VERSION)_amd64.snap
 
-zookeeper_$(ZOOKEEPER_VERSION)_amd64.snap:
+zk_$(ZOOKEEPER_VERSION)_amd64.snap:
 	SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=6G snapcraft
 
 .PHONY: clean-snap
