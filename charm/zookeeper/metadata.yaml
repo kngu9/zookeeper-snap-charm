@@ -1,0 +1,24 @@
+name: zookeeper
+summary: <Fill in summary here>
+maintainer: Parallels <Parallels@parallels-Parallels-Virtual-Platform>
+description: |
+  <Multi-line description here>
+tags:
+  # Replace "misc" with one or more whitelisted tags from this list:
+  # https://jujucharms.com/docs/stable/authors-charm-metadata
+  - misc
+subordinate: false
+provides:
+  client:
+    interface: zookeeper
+# requires:
+#   requires-relation:
+#     interface: interface-name
+# peers:
+#   peer-relation:
+#     interface: interface-name
+resources:
+  zookeeper:
+    type: file
+    filename: zk.snap
+    description: Zookeeper snap package
