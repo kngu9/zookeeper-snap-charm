@@ -22,25 +22,37 @@ parts:
     source: https://github.com/apache/zookeeper.git
     source-depth: 1
     source-tag: release-3.4.13
+    ant-build-targets: ['tar']
+    stage-packages:
+    - default-jre-headless
     override-build: |-
+      # patch out cppunit configuration; it depends on an autoconf macro that is no longer packaged
+      patch -p0 build.xml <<EOF
+      741c741
+      <             depends="jar,bin-jar,src-jar,javadoc-jar,test-jar,api-report,create-cppunit-configure,compile-test"
+      ---
+      >             depends="jar,bin-jar,src-jar,javadoc-jar,test-jar,api-report,compile-test"
+      EOF
+      # build the release tarball
       snapcraftctl build
-
-      cp ./build/zookeeper-3.4.13.jar .
-      cp ./conf/zoo_sample.cfg ./conf/zoo.cfg
-      (cd ../; tar -czf zookeeper.tgz ./build)
+      # unpack it into a stage-able filesystem arrangement
+      mkdir -p $SNAPCRAFT_PART_INSTALL/opt/zookeeper/conf
+      cp conf/zoo_sample.cfg $SNAPCRAFT_PART_INSTALL/opt/zookeeper/conf/zoo.cfg
+      build_dir=$(pwd)
+      (cd $SNAPCRAFT_PART_INSTALL/opt/zookeeper; tar --strip-components=1 -xzf $build_dir/build/zookeeper-*.tar.gz)
+    stage:
+    - bin
+    - etc
+    - lib
+    - opt
+    - usr
+    prime:
+    - bin
+    - etc
+    - lib
+    - opt
+    - usr
+    - -usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts
   wrapper:
     plugin: dump
     source: snap/local
-  install:
-    plugin: nil
-    after:
-      - zookeeper
-    override-build: |-
-      tarball=/root/parts/zookeeper/zookeeper.tgz
-
-      mkdir -p $SNAPCRAFT_PART_INSTALL/opt/zookeeper
-      (cd $SNAPCRAFT_PART_INSTALL/opt; tar --strip-components=2 -C zookeeper -xzvf $tarball)
-    stage:
-      - opt
-    prime:
-      - opt
