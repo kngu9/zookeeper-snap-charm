@@ -226,7 +226,11 @@ def check_cluster_departed(zkpeer, zkpeer_departed):
 @when('zookeeper.started', 'leadership.is_leader', 'zkpeer.changed')
 def check_cluster_changed(zkpeer):
     check_cluster(zkpeer)
-    zkpeer.dismiss_changed()
+    # zkpeer.dismiss_changed can break under some conditions; better to just
+    # remove the state directly. See
+    # https://github.com/juju-solutions/interface-zookeeper-quorum/issues/9
+    # for details.
+    clear_flag('zkpeer.changed')
 
 
 @when('leadership.changed.restart_queue', 'zkpeer.joined')
