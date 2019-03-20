@@ -1,7 +1,7 @@
 import json
 import time
 
-from charmhelpers.core import hookenv
+from charmhelpers.core import hookenv, unitdata
 
 from charms.reactive import (when, when_not, set_flag, hook,
                              clear_flag, is_state, is_flag_set)
@@ -30,6 +30,8 @@ def configure():
                      cfg.get('autopurge_purge_interval')),
         data_changed('zk.autopurge_snap_retain_count',
                      cfg.get('autopurge_snap_retain_count')),
+        data_changed('zk.storage.data_dir',
+                     unitdata.kv().get('zookeeper.storage.data_dir')),
     ))
     if changed or is_flag_set('zookeeper.force-reconfigure'):
         zookeeper.install()

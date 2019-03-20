@@ -17,7 +17,7 @@ import os
 import subprocess
 import yaml
 
-from charmhelpers.core import host, hookenv
+from charmhelpers.core import host, hookenv, unitdata
 from charmhelpers.core.templating import render
 
 from charms.reactive.relations import RelationBase
@@ -112,7 +112,8 @@ class Zookeeper(object):
         '''
         cfg = hookenv.config()
         myid = hookenv.local_unit().split('/')[1]
-        datadir = os.path.join(SNAP_COMMON, 'data')
+        datadir = unitdata.kv().get('zookeeper.storage.data_dir',
+                                    os.path.join(SNAP_COMMON, 'data'))
         os.makedirs(datadir, exist_ok=True)
         render(
             source="zoo.cfg",
