@@ -10,13 +10,12 @@ snap: zk_$(ZK_VERSION)_amd64.snap
 zookeeper_$(ZK_VERSION)_amd64.snap:
 	SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=6G snapcraft
 
-.PHONY: fat-charm
-fat-charm: zk_$(ZK_VERSION)_amd64.snap
-	cp $< charm/zookeeper/zk.snap
-	$(MAKE) -C charm/zookeeper
+.PHONY: lint
+lint:
+	flake8 --ignore=E121,E123,E126,E226,E24,E704,E265 charm/zookeeper
 
 .PHONY: charm
-charm: charm/builds/kafka
+charm: charm/builds/zookeeper
 
 charm/builds/zookeeper:
 	$(MAKE) -C charm/zookeeper
