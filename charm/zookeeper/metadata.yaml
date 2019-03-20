@@ -16,13 +16,12 @@ series:
 provides:
   zookeeper:
     interface: zookeeper
-  # TODO: implement nagios relations
-  #nrpe-external-master:
-    #interface": nrpe-external-master
-    #scope": container
-  #local-monitors":
-    #interface: local-monitors
-    #scope: container
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
+  local-monitors:
+    interface: local-monitors
+    scope: container
 peers:
   zkpeer:
     interface: zookeeper-quorum
