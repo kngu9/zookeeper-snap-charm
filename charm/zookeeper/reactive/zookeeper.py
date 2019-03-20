@@ -7,21 +7,10 @@ from charms.reactive import (when, when_not, set_flag, hook,
                              clear_flag, is_state, is_flag_set)
 from charms.reactive.helpers import data_changed
 
-from charms.layer import snap
-
 from charms.layer.zookeeper import (
     Zookeeper, get_package_version, ZK_PORT, ZK_REST_PORT)
 
 from charms.leadership import leader_set, leader_get
-
-
-@hook('stop')
-def uninstall():
-    try:
-        snap.remove('zk')
-    except Exception as e:
-        # log errors but do not fail stop hook
-        hookenv.log('failed to remove snap: {}'.format(e), hookenv.ERROR)
 
 
 @hook('config-changed')
@@ -238,28 +227,3 @@ def update_restart_queue(zkpeer):
     if new_queue != queue:
         hookenv.log('Leader updating restart queue: {}'.format(queue))
         leader_set(restart_queue=json.dumps(new_queue))
-
-
-@when('zookeeper.started')
-def autostart_service():
-    '''
-    Attempt to restart the service if it is not running.
-
-    '''
-    zookeeper = Zookeeper()
-    if zookeeper.is_running():
-        hookenv.status_set('active',
-                           'ready {}'.format(zookeeper.quorum_check()))
-        return
-
-    for i in range(3):
-        hookenv.status_set('maintenance',
-                           'attempting to restart zookeeper, '
-                           'attempt: {}'.format(i+1))
-        zookeeper.restart()
-        if zookeeper.is_running():
-            hookenv.status_set('active',
-                               'ready {}'.format(zookeeper.quorum_check()))
-            return
-
-    hookenv.status_set('blocked', 'failed to start zookeeper; check syslog')
