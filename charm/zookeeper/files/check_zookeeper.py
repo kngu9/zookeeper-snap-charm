@@ -34,7 +34,7 @@ import logging
 import re
 import subprocess
 
-from io import BytesIO
+from io import StringIO
 from optparse import OptionParser, OptionGroup
 
 
@@ -219,7 +219,7 @@ class ZooKeeperServer(object):
 
     def _parse_stat(self, data):
         """ Parse the output from the 'stat' 4letter word command """
-        h = BytesIO(data)
+        h = StringIO(data.decode('utf-8'))
 
         result = {}
 
