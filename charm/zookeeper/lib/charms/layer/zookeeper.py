@@ -20,15 +20,14 @@ import yaml
 from charmhelpers.core import host, hookenv
 from charmhelpers.core.templating import render
 
-from charms import layer
 from charms.reactive.relations import RelationBase
 
 
-ZK_PORT=2181
-ZK_REST_PORT=9998
-SNAP_NAME='zk'
-SNAP_COMMON='/var/snap/{}/common'.format(SNAP_NAME)
-SERVICE_NAME='snap.{name}.{name}.service'.format(name=SNAP_NAME)
+ZK_PORT = 2181
+ZK_REST_PORT = 9998
+SNAP_NAME = 'zk'
+SNAP_COMMON = '/var/snap/{}/common'.format(SNAP_NAME)
+SERVICE_NAME = 'snap.{name}.{name}.service'.format(name=SNAP_NAME)
 
 
 def format_node(unit, node_ip):
@@ -44,7 +43,7 @@ def format_node(unit, node_ip):
 def get_package_version():
     with open('/snap/{}/current/meta/snap.yaml'.format(SNAP_NAME), 'r') as f:
         meta = yaml.load(f)
-        return meta.get('version')  
+        return meta.get('version')
     return None
 
 
@@ -70,7 +69,8 @@ class Zookeeper(object):
             return "leader" in status.decode('utf-8')
         except Exception:
             hookenv.log(
-                "Unable to determine whether this node is the Zookeeper leader.",
+                "Unable to determine whether this node is the Zookeeper "
+                "leader.",
                 level="WARN"
             )
             return False
@@ -125,8 +125,10 @@ class Zookeeper(object):
                 'ensemble': self.read_peers(),
                 'client_bind_addr': hookenv.unit_private_ip(),
                 'port': ZK_PORT,
-                'autopurge_purge_interval': cfg.get('autopurge_purge_interval'),
-                'autopurge_snap_retain_count': cfg.get('autopurge_snap_retain_count'),
+                'autopurge_purge_interval': cfg.get(
+                    'autopurge_purge_interval'),
+                'autopurge_snap_retain_count': cfg.get(
+                    'autopurge_snap_retain_count'),
             })
         with open(os.path.join(datadir, 'myid'), 'w') as f:
             f.write(myid)
@@ -155,6 +157,9 @@ class Zookeeper(object):
 
         '''
         host.service_stop(SERVICE_NAME)
+
+    def is_running(self):
+        return host.service_running(SERVICE_NAME)
 
     def open_ports(self):
         '''

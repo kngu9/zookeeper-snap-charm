@@ -1,67 +1,16 @@
-import glob
 import json
-import os
-from subprocess import check_call
 import time
 
 from charmhelpers.core import hookenv
 
-from charms.reactive import when, when_not, set_flag, hook, clear_flag, is_state, is_flag_set
+from charms.reactive import (when, when_not, set_flag, hook,
+                             clear_flag, is_state, is_flag_set)
 from charms.reactive.helpers import data_changed
 
 from charms.layer.zookeeper import (
-    Zookeeper, get_package_version, SNAP_NAME, ZK_PORT, ZK_REST_PORT)
+    Zookeeper, get_package_version, ZK_PORT, ZK_REST_PORT)
 
 from charms.leadership import leader_set, leader_get
-
-
-@when_not('zookeeper.installed')
-def install():
-    install_snap()
-
-
-@hook('upgrade-charm')
-def upgrade():
-    install_snap(upgrade=True)
-
-
-@hook('stop')
-def uninstall():
-    try:
-        check_call(['snap', 'remove', SNAP_NAME])
-    except Exception as e:
-        # log errors but do not fail stop hook
-        hookenv.log('failed to remove snap: {}'.format(e), hookenv.ERROR)
-
-
-def install_snap(upgrade=False):
-    # Need to install the core snap explicit. If not, there's
-    # no slots for removable-media on a bionic install.
-    # Not sure if that's a snapd bug or intended behavior.
-    check_call(['snap', 'install', 'core'])
-
-    snap_file = get_snap_file_from_charm()
-    if not snap_file:
-        snap_file = hookenv.resource_get('zookeeper')
-    if not snap_file:
-        if upgrade:
-            check_call(['snap', 'refresh', SNAP_NAME])
-        else:
-            check_call(['snap', 'install', SNAP_NAME])
-    else:
-        check_call(['snap', 'install', '--dangerous', snap_file])
-    check_call(['snap', 'connect', '{}:removable-media'.format(SNAP_NAME)])
-    set_flag('zookeeper.installed')
-    # force a reconfigure on upgrade; templates may have changed
-    clear_flag('zookeeper.configured')
-    set_flag('zookeeper.force-reconfigure')
-
-
-def get_snap_file_from_charm():
-    snap_files = sorted(glob.glob(os.path.join(hookenv.charm_dir(), "{}*.snap".format(SNAP_NAME))))[::-1]
-    if not snap_files:
-        return None
-    return snap_files[0]
 
 
 @hook('config-changed')
@@ -70,15 +19,17 @@ def config_changed():
     clear_flag('zookeeper.configured')
 
 
-@when('zookeeper.installed')
+@when('snap.installed.zk')
 @when_not('zookeeper.configured')
 def configure():
     cfg = hookenv.config()
     zookeeper = Zookeeper()
     changed = any((
         data_changed('zkpeer.nodes', zookeeper.read_peers()),
-        data_changed('zk.autopurge_purge_interval', cfg.get('autopurge_purge_interval')),
-        data_changed('zk.autopurge_snap_retain_count', cfg.get('autopurge_snap_retain_count')),
+        data_changed('zk.autopurge_purge_interval',
+                     cfg.get('autopurge_purge_interval')),
+        data_changed('zk.autopurge_snap_retain_count',
+                     cfg.get('autopurge_snap_retain_count')),
     ))
     if changed or is_flag_set('zookeeper.force-reconfigure'):
         zookeeper.install()

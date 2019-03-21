@@ -3,3 +3,11 @@ includes:
 - "layer:leadership"
 - "interface:zookeeper"
 - "interface:zookeeper-quorum"
+- "layer:snap"
+options:
+  snap:
+    core: {}
+    zk:
+      connect:
+      - ['zk:removable-media', 'core:removable-media']
+repo: https://github.com/cloud-green/zookeeper-snap-charm.git
