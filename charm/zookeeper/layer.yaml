@@ -4,6 +4,8 @@ includes:
 - "interface:zookeeper"
 - "interface:zookeeper-quorum"
 - "layer:snap"
+- "interface:nrpe-external-master"
+- "interface:local-monitors"
 options:
   snap:
     core: {}
