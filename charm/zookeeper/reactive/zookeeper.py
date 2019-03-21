@@ -7,8 +7,10 @@ from charms.reactive import (when, when_not, set_flag, hook,
                              clear_flag, is_state, is_flag_set)
 from charms.reactive.helpers import data_changed
 
+from charms.layer.snap import get_installed_version
+
 from charms.layer.zookeeper import (
-    Zookeeper, get_package_version, ZK_PORT, ZK_REST_PORT)
+    SNAP_NAME, Zookeeper, ZK_PORT, ZK_REST_PORT)
 
 from charms.leadership import leader_set, leader_get
 
@@ -41,7 +43,7 @@ def configure():
     set_flag('zookeeper.configured')
     hookenv.status_set('active', 'ready {}'.format(zookeeper.quorum_check()))
     # set app version string for juju status output
-    zoo_version = get_package_version() or 'unknown'
+    zoo_version = get_installed_version(SNAP_NAME) or 'unknown'
     hookenv.application_version_set(zoo_version)
 
 

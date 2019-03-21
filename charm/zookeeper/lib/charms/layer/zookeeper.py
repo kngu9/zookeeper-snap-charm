@@ -15,7 +15,6 @@
 
 import os
 import subprocess
-import yaml
 
 from charmhelpers.core import host, hookenv, unitdata
 from charmhelpers.core.templating import render
@@ -38,13 +37,6 @@ def format_node(unit, node_ip):
 
     '''
     return (unit.split("/")[1], "{ip}:2888:3888".format(ip=node_ip))
-
-
-def get_package_version():
-    with open('/snap/{}/current/meta/snap.yaml'.format(SNAP_NAME), 'r') as f:
-        meta = yaml.load(f)
-        return meta.get('version')
-    return None
 
 
 class Zookeeper(object):
