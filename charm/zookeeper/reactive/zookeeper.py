@@ -1,14 +1,16 @@
 import json
 import time
 
-from charmhelpers.core import hookenv
+from charmhelpers.core import hookenv, unitdata
 
 from charms.reactive import (when, when_not, set_flag, hook,
                              clear_flag, is_state, is_flag_set)
 from charms.reactive.helpers import data_changed
 
+from charms.layer.snap import get_installed_version
+
 from charms.layer.zookeeper import (
-    Zookeeper, get_package_version, ZK_PORT, ZK_REST_PORT)
+    SNAP_NAME, Zookeeper, ZK_PORT, ZK_REST_PORT)
 
 from charms.leadership import leader_set, leader_get
 
@@ -30,6 +32,8 @@ def configure():
                      cfg.get('autopurge_purge_interval')),
         data_changed('zk.autopurge_snap_retain_count',
                      cfg.get('autopurge_snap_retain_count')),
+        data_changed('zk.storage.data_dir',
+                     unitdata.kv().get('zookeeper.storage.data_dir')),
     ))
     if changed or is_flag_set('zookeeper.force-reconfigure'):
         zookeeper.install()
@@ -39,7 +43,7 @@ def configure():
     set_flag('zookeeper.configured')
     hookenv.status_set('active', 'ready {}'.format(zookeeper.quorum_check()))
     # set app version string for juju status output
-    zoo_version = get_package_version() or 'unknown'
+    zoo_version = get_installed_version(SNAP_NAME) or 'unknown'
     hookenv.application_version_set(zoo_version)
 
 

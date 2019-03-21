@@ -15,9 +15,8 @@
 
 import os
 import subprocess
-import yaml
 
-from charmhelpers.core import host, hookenv
+from charmhelpers.core import host, hookenv, unitdata
 from charmhelpers.core.templating import render
 
 from charms.reactive.relations import RelationBase
@@ -38,13 +37,6 @@ def format_node(unit, node_ip):
 
     '''
     return (unit.split("/")[1], "{ip}:2888:3888".format(ip=node_ip))
-
-
-def get_package_version():
-    with open('/snap/{}/current/meta/snap.yaml'.format(SNAP_NAME), 'r') as f:
-        meta = yaml.load(f)
-        return meta.get('version')
-    return None
 
 
 class Zookeeper(object):
@@ -112,7 +104,8 @@ class Zookeeper(object):
         '''
         cfg = hookenv.config()
         myid = hookenv.local_unit().split('/')[1]
-        datadir = os.path.join(SNAP_COMMON, 'data')
+        datadir = unitdata.kv().get('zookeeper.storage.data_dir',
+                                    os.path.join(SNAP_COMMON, 'data'))
         os.makedirs(datadir, exist_ok=True)
         render(
             source="zoo.cfg",
