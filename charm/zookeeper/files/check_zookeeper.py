@@ -330,7 +330,7 @@ def get_cluster_stats(servers):
             zk = ZooKeeperServer(host, port)
             stats["%s:%s" % (host, port)] = zk.get_stats()
 
-        except socket.error as e:
+        except socket.error:
             # ignore because the cluster can still work even
             # if some servers fail completely
 
