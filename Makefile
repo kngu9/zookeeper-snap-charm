@@ -7,7 +7,7 @@ all: sysdeps snap
 .PHONY: snap
 snap: zk_$(ZK_VERSION)_amd64.snap
 
-zookeeper_$(ZK_VERSION)_amd64.snap:
+zk_$(ZK_VERSION)_amd64.snap:
 	SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=6G snapcraft
 
 .PHONY: lint
