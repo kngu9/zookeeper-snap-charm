@@ -37,8 +37,8 @@ def setup_nagios(nagios):
     }, {
         'name': 'zk_max_latency',
         'description': 'ZK_Max_Latency',
-        'warn': 1000,
-        'crit': 2000,
+        'warn': 2000,
+        'crit': 3000,
     }, {
         'name': 'zk_min_latency',
         'description': 'ZK_Min_Latency',
