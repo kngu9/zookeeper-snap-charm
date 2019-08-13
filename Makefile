@@ -8,7 +8,7 @@ all: sysdeps snap
 snap: zk_$(ZK_VERSION)_amd64.snap
 
 zk_$(ZK_VERSION)_amd64.snap:
-	SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=6G snapcraft
+	snapcraft --use-lxd
 
 .PHONY: lint
 lint:
@@ -31,6 +31,7 @@ clean-charm:
 .PHONY: clean-snap
 clean-snap:
 	snapcraft clean
+	$(RM) zk_*.snap
 
 .PHONY: clean
 clean: clean-snap clean-charm
