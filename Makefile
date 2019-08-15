@@ -2,7 +2,7 @@
 ZK_VERSION := $(shell awk '/version:/ {print $$2}' snap/snapcraft.yaml | head -1 | sed "s/'//g")
 
 .PHONY: all
-all: sysdeps snap
+all: sysdeps snap charm
 
 .PHONY: snap
 snap: zk_$(ZK_VERSION)_amd64.snap
